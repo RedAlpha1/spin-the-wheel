@@ -7,20 +7,23 @@ type Props = {
   size: number;
 };
 
-// On-device check showed 0.32 swallowing the wedge labels — shrunk so the
-// flower+swan stay a small center emblem clear of the label radius.
-// Feedback: still too big relative to the wheel — shrunk further to 0.14.
-const HUB_DECORATION_RATIO = 0.14;
 // The maroon/gold backdrop disc the flower+swan sit on (matches the
-// downloaded mockup asset). Shrunk alongside the decoration so it stays a
-// tight backing plate instead of a large center medallion.
+// downloaded mockup asset).
 const HUB_BACKDROP_RATIO = 0.19;
+// Reference mockup: the flower fills almost the whole backdrop disc as a
+// radiating petal pattern, with the swan smaller and centered on top of it
+// — not the same size as the flower, which is what made the flower
+// invisible before.
+const HUB_FLOWER_TO_BACKDROP_RATIO = 0.88;
+const HUB_SWAN_TO_BACKDROP_RATIO = 0.52;
 
 function HubBase({ size }: Props) {
-  const hubDecorationSize = size * HUB_DECORATION_RATIO;
-  const hubDecorationOffset = (size - hubDecorationSize) / 2;
   const hubBackdropSize = size * HUB_BACKDROP_RATIO;
   const hubBackdropOffset = (size - hubBackdropSize) / 2;
+  const hubFlowerSize = hubBackdropSize * HUB_FLOWER_TO_BACKDROP_RATIO;
+  const hubFlowerOffset = (size - hubFlowerSize) / 2;
+  const hubSwanSize = hubBackdropSize * HUB_SWAN_TO_BACKDROP_RATIO;
+  const hubSwanOffset = (size - hubSwanSize) / 2;
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
@@ -44,10 +47,10 @@ function HubBase({ size }: Props) {
         source={require('../../../assets/images/wheel/wheel-hub-flower.png')}
         style={{
           position: 'absolute',
-          left: hubDecorationOffset,
-          top: hubDecorationOffset,
-          width: hubDecorationSize,
-          height: hubDecorationSize,
+          left: hubFlowerOffset,
+          top: hubFlowerOffset,
+          width: hubFlowerSize,
+          height: hubFlowerSize,
         }}
         contentFit="contain"
       />
@@ -55,10 +58,10 @@ function HubBase({ size }: Props) {
         source={require('../../../assets/images/wheel/wheel-hub-swan.png')}
         style={{
           position: 'absolute',
-          left: hubDecorationOffset,
-          top: hubDecorationOffset,
-          width: hubDecorationSize,
-          height: hubDecorationSize,
+          left: hubSwanOffset,
+          top: hubSwanOffset,
+          width: hubSwanSize,
+          height: hubSwanSize,
         }}
         contentFit="contain"
       />
