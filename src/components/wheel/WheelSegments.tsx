@@ -37,13 +37,17 @@ function WheelSegmentsBase({ segments, size }: Props) {
   const cx = size / 2;
   const cy = size / 2;
   const r = (size / 2) * WHEEL_INNER_RADIUS_RATIO;
-  const iconSize = size * 0.13;
-  const iconRadius = r * 0.72;
-  const labelRadius = r * 0.48;
+  // Icon pushed further toward the rim, label pulled further toward the
+  // hub, and both shrunk slightly — the previous 0.72/0.48 split let the
+  // label's outer edge run into the icon's inner edge (most visible on the
+  // top wedge, where both sit on the same vertical line).
+  const iconSize = size * 0.115;
+  const iconRadius = r * 0.78;
+  const labelRadius = r * 0.44;
   // Single-line labels (e.g. "Extra Spin") were wider than the wedge's
   // chord at labelRadius and spilled into the neighboring segment — each
   // label wraps onto its own words as stacked lines instead.
-  const fontSize = size * 0.036;
+  const fontSize = size * 0.033;
   const lineHeight = fontSize * 1.15;
 
   const slices = useMemo(

@@ -9,7 +9,7 @@ type Props = {
 
 // The maroon/gold center medallion (flower + swan + needle, pre-composited
 // per user-provided asset) sized as a fraction of the wheel.
-const HUB_MEDALLION_RATIO = 0.19;
+const HUB_MEDALLION_RATIO = 0.24;
 // wheel-hub-medallion.png is 354x410: a 354x354 circle with a needle baked
 // onto its own top edge occupying the remaining 56px. The needle attaches
 // to the medallion's own gold ring, not the wheel's outer rim — sizing and
