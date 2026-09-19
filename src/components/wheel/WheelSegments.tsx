@@ -39,9 +39,9 @@ function WheelSegmentsBase({ segments, size }: Props) {
   const r = (size / 2) * WHEEL_INNER_RADIUS_RATIO;
   // 0.78/0.115 pushed the icon's outer edge to within ~15pt of the wedge's
   // own outer radius, close enough to the ring's petals to read as
-  // touching. Pulled back in and shrunk a touch more, while keeping
-  // clearance from the label below it (see labelRadius).
-  const iconSize = size * 0.1;
+  // touching. Pulled back in, while keeping clearance from the label below
+  // it (see labelRadius).
+  const iconSize = size * 0.13;
   const iconRadius = r * 0.72;
   const labelRadius = r * 0.44;
   // noWin has no label sharing the wedge, so its icon centers on the
