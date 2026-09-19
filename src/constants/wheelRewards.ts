@@ -18,7 +18,7 @@ export const WHEEL_REWARDS: WheelReward[] = [
     kind: 'extraSpin',
     label: 'Extra Spin',
     icon: require('../../assets/images/wheel/reward-icon-extra-spin.png'),
-    colors: ['#4A6CF7', '#1E3A8A'],
+    colors: ['#0221C6', '#011060'],
     coinValue: 0,
     weight: 10,
   },
