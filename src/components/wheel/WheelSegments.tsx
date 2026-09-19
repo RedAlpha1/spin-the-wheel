@@ -16,10 +16,13 @@ import { describeArc, polarToCartesian, segmentBounds } from '@/utils/wheelMath'
 export type WheelSegment = WheelReward;
 
 // Wedges stop short of `wheel-border-ring.png`'s inner edge (see
-// docs/superpowers/specs/2026-09-19-spin-wheel-phase2-design.md) — the
-// `x1.01` overshoot tucks the wedge edge slightly under the ring so no
-// anti-aliasing seam shows.
-const WHEEL_INNER_RADIUS_RATIO = (888 / 1131) * 1.01;
+// docs/superpowers/specs/2026-09-19-spin-wheel-phase2-design.md). The ring
+// asset has a transparent buffer between its petals and the measured hole
+// edge, so on-device feedback (icon/label text felt cramped) pushed this
+// overshoot well past the original 1.01 anti-aliasing margin — wedges now
+// fill that buffer too, leaving a visibly thinner border and more room for
+// each wedge's icon + label.
+const WHEEL_INNER_RADIUS_RATIO = (888 / 1131) * 1.14;
 
 type Props = {
   segments: WheelSegment[];
