@@ -20,7 +20,10 @@ export function pickWeightedIndex(weights: number[], random: () => number = Math
   return weights.length - 1;
 }
 
-const FULL_TURNS = 5;
+// UX research on prize-wheel spins: ~3-4s duration with 5-10 full turns and
+// a cubic ease-out balances visual drama against feeling sluggish. 2500ms/5
+// turns read as too fast/abrupt — bumped to 4000ms/7 turns.
+const FULL_TURNS = 7;
 
 function mod360(deg: number): number {
   return ((deg % 360) + 360) % 360;
@@ -38,7 +41,7 @@ export function computeTargetRotation(current: number, mid: number, fullTurns: n
   return current + 360 * fullTurns + delta;
 }
 
-const SPIN_DURATION_MS = 2500;
+const SPIN_DURATION_MS = 4000;
 
 export type SpinState = 'idle' | 'spinning' | 'result';
 
