@@ -7,34 +7,27 @@ type Props = {
   size: number;
 };
 
-// The maroon/gold backdrop disc the flower+swan sit on (matches the
-// downloaded mockup asset).
-const HUB_BACKDROP_RATIO = 0.19;
-// Reference mockup: the flower fills almost the whole backdrop disc as a
-// radiating petal pattern, with the swan smaller and centered on top of it
-// — not the same size as the flower, which is what made the flower
-// invisible before.
-const HUB_FLOWER_TO_BACKDROP_RATIO = 0.88;
-const HUB_SWAN_TO_BACKDROP_RATIO = 0.52;
-// wheel-pointer-needle.png is a plain gold triangle, apex up / base down —
-// mounted flipped (apex down) so its tip is what touches the wheel, aimed
-// at whichever wedge sits at 12 o'clock (the winner once a spin settles —
-// see computeTargetRotation, which aligns the winner's mid angle to
-// 0deg/top). Most of the needle overlaps the rim's top scallop so it reads
-// as attached to the wheel rather than floating above it.
-const POINTER_ASPECT = 63 / 70;
-const POINTER_WIDTH_RATIO = 0.12;
-const POINTER_OVERLAP_RATIO = 0.7;
+// The maroon/gold center medallion (flower + swan + needle, pre-composited
+// per user-provided asset) sized as a fraction of the wheel.
+const HUB_MEDALLION_RATIO = 0.19;
+// wheel-hub-medallion.png is 354x410: a 354x354 circle with a needle baked
+// onto its own top edge occupying the remaining 56px. The needle attaches
+// to the medallion's own gold ring, not the wheel's outer rim — sizing and
+// positioning off these measured proportions keeps that attachment intact
+// at any wheel size.
+const MEDALLION_CIRCLE_PX = 354;
+const MEDALLION_TOTAL_HEIGHT_PX = 410;
+const MEDALLION_ASPECT = MEDALLION_TOTAL_HEIGHT_PX / MEDALLION_CIRCLE_PX;
 
 function HubBase({ size }: Props) {
-  const hubBackdropSize = size * HUB_BACKDROP_RATIO;
-  const hubBackdropOffset = (size - hubBackdropSize) / 2;
-  const hubFlowerSize = hubBackdropSize * HUB_FLOWER_TO_BACKDROP_RATIO;
-  const hubFlowerOffset = (size - hubFlowerSize) / 2;
-  const hubSwanSize = hubBackdropSize * HUB_SWAN_TO_BACKDROP_RATIO;
-  const hubSwanOffset = (size - hubSwanSize) / 2;
-  const pointerWidth = size * POINTER_WIDTH_RATIO;
-  const pointerHeight = pointerWidth * POINTER_ASPECT;
+  const medallionWidth = size * HUB_MEDALLION_RATIO;
+  const medallionHeight = medallionWidth * MEDALLION_ASPECT;
+  const medallionLeft = (size - medallionWidth) / 2;
+  // The circle's center sits at (total - circle/2) from the image top —
+  // aligning that point to the wheel's own center is what keeps the
+  // needle's attachment point consistent regardless of wheel size.
+  const circleCenterFromTop = medallionHeight - medallionWidth / 2;
+  const medallionTop = size / 2 - circleCenterFromTop;
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
@@ -44,47 +37,13 @@ function HubBase({ size }: Props) {
         contentFit="contain"
       />
       <Image
-        source={require('../../../assets/images/wheel/wheel-hub-backdrop.png')}
+        source={require('../../../assets/images/wheel/wheel-hub-medallion.png')}
         style={{
           position: 'absolute',
-          left: hubBackdropOffset,
-          top: hubBackdropOffset,
-          width: hubBackdropSize,
-          height: hubBackdropSize,
-        }}
-        contentFit="contain"
-      />
-      <Image
-        source={require('../../../assets/images/wheel/wheel-hub-flower.png')}
-        style={{
-          position: 'absolute',
-          left: hubFlowerOffset,
-          top: hubFlowerOffset,
-          width: hubFlowerSize,
-          height: hubFlowerSize,
-        }}
-        contentFit="contain"
-      />
-      <Image
-        source={require('../../../assets/images/wheel/wheel-hub-swan.png')}
-        style={{
-          position: 'absolute',
-          left: hubSwanOffset,
-          top: hubSwanOffset,
-          width: hubSwanSize,
-          height: hubSwanSize,
-        }}
-        contentFit="contain"
-      />
-      <Image
-        source={require('../../../assets/images/wheel/wheel-pointer-needle.png')}
-        style={{
-          position: 'absolute',
-          left: size / 2 - pointerWidth / 2,
-          top: -pointerHeight * (1 - POINTER_OVERLAP_RATIO),
-          width: pointerWidth,
-          height: pointerHeight,
-          transform: [{ rotate: '180deg' }],
+          left: medallionLeft,
+          top: medallionTop,
+          width: medallionWidth,
+          height: medallionHeight,
         }}
         contentFit="contain"
       />
