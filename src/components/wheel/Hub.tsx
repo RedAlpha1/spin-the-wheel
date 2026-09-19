@@ -12,8 +12,13 @@ type Props = {
 // on-device tuning.
 const POINTER_ASPECT = 28 / 37;
 const POINTER_WIDTH_RATIO = 0.14;
-const POINTER_Y_CENTER_RATIO = 0.38;
-const HUB_DECORATION_RATIO = 0.32;
+// On-device check (see spec) showed the 0.38 estimate colliding with wedge
+// labels/icons and the hub decoration — moved up near the rim instead,
+// where a wheel pointer conventionally sits.
+const POINTER_Y_CENTER_RATIO = 0.12;
+// On-device check showed 0.32 swallowing the wedge labels — shrunk so the
+// flower+swan stay a small center emblem clear of the label radius.
+const HUB_DECORATION_RATIO = 0.2;
 
 function HubBase({ size }: Props) {
   const pointerWidth = size * POINTER_WIDTH_RATIO;
