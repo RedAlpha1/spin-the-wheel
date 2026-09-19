@@ -44,6 +44,10 @@ function WheelSegmentsBase({ segments, size }: Props) {
   const iconSize = size * 0.1;
   const iconRadius = r * 0.72;
   const labelRadius = r * 0.44;
+  // noWin has no label sharing the wedge, so its icon centers on the
+  // midpoint between hub and rim instead of sitting up near the icon
+  // radius, leaving the lower half empty.
+  const centeredIconRadius = (iconRadius + labelRadius) / 2;
   // Single-line labels (e.g. "Extra Spin") were wider than the wedge's
   // chord at labelRadius and spilled into the neighboring segment — each
   // label wraps onto its own words as stacked lines instead.
@@ -55,11 +59,16 @@ function WheelSegmentsBase({ segments, size }: Props) {
       segments.map((segment, index) => {
         const { start, end, mid } = segmentBounds(index, segments.length);
         const path = describeArc(cx, cy, r, start, end);
-        const iconPos = polarToCartesian(cx, cy, iconRadius, mid);
+        const iconPos = polarToCartesian(
+          cx,
+          cy,
+          segment.kind === 'noWin' ? centeredIconRadius : iconRadius,
+          mid,
+        );
         const labelPos = polarToCartesian(cx, cy, labelRadius, mid);
         return { segment, path, iconPos, labelPos, mid };
       }),
-    [segments, cx, cy, r, iconRadius, labelRadius],
+    [segments, cx, cy, r, iconRadius, labelRadius, centeredIconRadius],
   );
 
   const gradients = useMemo(() => {
