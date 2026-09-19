@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Wheel } from '@/components/wheel/Wheel';
 import type { WheelSegment } from '@/components/wheel/WheelSegments';
+import { BottomTabInset, Spacing } from '@/constants/theme';
 
 const SEGMENT_COLORS = [
   '#E63946', '#F1A208', '#2A9D8F', '#264653',
@@ -26,7 +27,7 @@ export default function HomeScreen() {
   const [count, setCount] = useState(6);
   const { width } = useWindowDimensions();
   const size = Math.min(width * 0.9, 420);
-  const segments = buildSegments(count);
+  const segments = useMemo(() => buildSegments(count), [count]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -57,6 +58,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 24,
+    paddingBottom: BottomTabInset + Spacing.three,
   },
   controls: {
     flexDirection: 'row',
