@@ -35,6 +35,13 @@ const SPIN_BUTTON_PADDING_V_RATIO = 14 / 390;
 const SPIN_BUTTON_PADDING_H_RATIO = 56 / 390;
 const SPIN_BUTTON_FONT_RATIO = 18 / 390;
 const SPINS_TEXT_FONT_RATIO = 14 / 390;
+// The ornamental flourishes flanking the button (user-provided assets) are
+// 141x141 native — sized relative to screen width like everything else,
+// overlapping the pill's rounded ends slightly so they read as attached
+// rather than floating beside it.
+const FLOURISH_WIDTH_RATIO = 0.16;
+const FLOURISH_ASPECT = 137 / 141;
+const FLOURISH_OVERLAP_RATIO = 0.35;
 // Native pixel aspect ratios of the two title images — sizing height off
 // the image's own aspect instead of a shared box avoids letterboxing.
 const TITLE_TOP_ASPECT = 77 / 497;
@@ -49,6 +56,9 @@ export default function HomeScreen() {
   const chipFontSize = width * CHIP_FONT_RATIO;
   const spinButtonFontSize = width * SPIN_BUTTON_FONT_RATIO;
   const spinsTextFontSize = width * SPINS_TEXT_FONT_RATIO;
+  const flourishWidth = width * FLOURISH_WIDTH_RATIO;
+  const flourishHeight = flourishWidth * FLOURISH_ASPECT;
+  const flourishOverlap = flourishWidth * FLOURISH_OVERLAP_RATIO;
 
   const [coins, setCoins] = useState(STARTING_COINS);
   const [spinsRemaining, setSpinsRemaining] = useState(STARTING_SPINS);
@@ -140,23 +150,35 @@ export default function HomeScreen() {
 
         <Wheel segments={WHEEL_REWARDS} size={wheelSize} rotation={rotation} />
 
-        <Pressable
-          style={styles.spinButtonWrapper}
-          disabled={state !== 'idle' || spinsRemaining <= 0}
-          onPress={spin}>
-          <LinearGradient
-            colors={['#FFCF87', '#C9971F']}
-            style={[
-              styles.spinButton,
-              {
-                paddingVertical: width * SPIN_BUTTON_PADDING_V_RATIO,
-                paddingHorizontal: width * SPIN_BUTTON_PADDING_H_RATIO,
-              },
-              (state !== 'idle' || spinsRemaining <= 0) && styles.spinButtonDisabled,
-            ]}>
-            <Text style={[styles.spinButtonText, { fontSize: spinButtonFontSize }]}>SPIN</Text>
-          </LinearGradient>
-        </Pressable>
+        <View style={styles.spinButtonRow}>
+          <Image
+            source={require('../../assets/images/wheel/spin-button-flourish-left.png')}
+            style={{ width: flourishWidth, height: flourishHeight, marginRight: -flourishOverlap }}
+            contentFit="contain"
+          />
+          <Pressable
+            style={styles.spinButtonWrapper}
+            disabled={state !== 'idle' || spinsRemaining <= 0}
+            onPress={spin}>
+            <LinearGradient
+              colors={['#FFF2D4', '#FFCF87']}
+              style={[
+                styles.spinButton,
+                {
+                  paddingVertical: width * SPIN_BUTTON_PADDING_V_RATIO,
+                  paddingHorizontal: width * SPIN_BUTTON_PADDING_H_RATIO,
+                },
+                (state !== 'idle' || spinsRemaining <= 0) && styles.spinButtonDisabled,
+              ]}>
+              <Text style={[styles.spinButtonText, { fontSize: spinButtonFontSize }]}>SPIN</Text>
+            </LinearGradient>
+          </Pressable>
+          <Image
+            source={require('../../assets/images/wheel/spin-button-flourish-right.png')}
+            style={{ width: flourishWidth, height: flourishHeight, marginLeft: -flourishOverlap }}
+            contentFit="contain"
+          />
+        </View>
 
         <Text style={[styles.spinsText, { fontSize: spinsTextFontSize }]}>
           {spinsRemaining}/{STARTING_SPINS} Spins
@@ -207,8 +229,13 @@ const styles = StyleSheet.create({
   titles: {
     alignItems: 'center',
   },
+  spinButtonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   spinButtonWrapper: {
     borderRadius: 28,
+    zIndex: 1,
   },
   spinButton: {
     borderRadius: 28,
@@ -219,7 +246,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   spinButtonText: {
-    color: '#4F031B',
+    color: '#1B0B33',
     fontWeight: 'bold',
   },
   spinsText: {
