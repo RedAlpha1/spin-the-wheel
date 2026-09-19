@@ -16,6 +16,15 @@ const HUB_BACKDROP_RATIO = 0.19;
 // invisible before.
 const HUB_FLOWER_TO_BACKDROP_RATIO = 0.88;
 const HUB_SWAN_TO_BACKDROP_RATIO = 0.52;
+// wheel-pointer-needle.png is a plain gold triangle, apex up / base down —
+// mounted flipped (apex down) so its tip is what touches the wheel, aimed
+// at whichever wedge sits at 12 o'clock (the winner once a spin settles —
+// see computeTargetRotation, which aligns the winner's mid angle to
+// 0deg/top). Most of the needle overlaps the rim's top scallop so it reads
+// as attached to the wheel rather than floating above it.
+const POINTER_ASPECT = 63 / 70;
+const POINTER_WIDTH_RATIO = 0.12;
+const POINTER_OVERLAP_RATIO = 0.7;
 
 function HubBase({ size }: Props) {
   const hubBackdropSize = size * HUB_BACKDROP_RATIO;
@@ -24,6 +33,8 @@ function HubBase({ size }: Props) {
   const hubFlowerOffset = (size - hubFlowerSize) / 2;
   const hubSwanSize = hubBackdropSize * HUB_SWAN_TO_BACKDROP_RATIO;
   const hubSwanOffset = (size - hubSwanSize) / 2;
+  const pointerWidth = size * POINTER_WIDTH_RATIO;
+  const pointerHeight = pointerWidth * POINTER_ASPECT;
 
   return (
     <View style={StyleSheet.absoluteFill} pointerEvents="none">
@@ -62,6 +73,18 @@ function HubBase({ size }: Props) {
           top: hubSwanOffset,
           width: hubSwanSize,
           height: hubSwanSize,
+        }}
+        contentFit="contain"
+      />
+      <Image
+        source={require('../../../assets/images/wheel/wheel-pointer-needle.png')}
+        style={{
+          position: 'absolute',
+          left: size / 2 - pointerWidth / 2,
+          top: -pointerHeight * (1 - POINTER_OVERLAP_RATIO),
+          width: pointerWidth,
+          height: pointerHeight,
+          transform: [{ rotate: '180deg' }],
         }}
         contentFit="contain"
       />
