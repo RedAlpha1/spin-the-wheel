@@ -36,7 +36,7 @@ function WheelSegmentsBase({ segments, size }: Props) {
   const r = (size / 2) * WHEEL_INNER_RADIUS_RATIO;
   const iconSize = size * 0.13;
   const iconRadius = r * 0.72;
-  const labelRadius = r * 0.4;
+  const labelRadius = r * 0.48;
   // Single-line labels (e.g. "Extra Spin") were wider than the wedge's
   // chord at labelRadius and spilled into the neighboring segment — each
   // label wraps onto its own words as stacked lines instead.
