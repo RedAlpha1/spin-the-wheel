@@ -104,6 +104,11 @@ function WheelSegmentsBase({ segments, size }: Props) {
           {segment.kind !== 'noWin' && (() => {
             const words = segment.label.split(' ');
             const startDy = -(lineHeight * (words.length - 1)) / 2;
+            // Rotating text by the wedge's raw mid angle reads upside down
+            // for any wedge in the bottom half (mid in (90, 270)) — flip an
+            // extra 180deg there so every label stays readable, matching
+            // the mockup.
+            const labelRotation = mid > 90 && mid < 270 ? mid + 180 : mid;
             return (
               <SvgText
                 x={labelPos.x}
@@ -112,7 +117,7 @@ function WheelSegmentsBase({ segments, size }: Props) {
                 fontWeight="bold"
                 fill="#ffffff"
                 textAnchor="middle"
-                transform={`rotate(${mid} ${labelPos.x} ${labelPos.y})`}>
+                transform={`rotate(${labelRotation} ${labelPos.x} ${labelPos.y})`}>
                 {words.map((word, wordIndex) => (
                   <TSpan
                     key={word}
