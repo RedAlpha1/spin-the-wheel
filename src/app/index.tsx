@@ -32,7 +32,6 @@ const TITLE_WIDTH_RATIO = 0.62;
 const CHIP_ICON_RATIO = 20 / 390;
 const CHIP_FONT_RATIO = 14 / 390;
 const SPIN_BUTTON_PADDING_V_RATIO = 14 / 390;
-const SPIN_BUTTON_PADDING_H_RATIO = 56 / 390;
 const SPIN_BUTTON_FONT_RATIO = 18 / 390;
 const SPINS_TEXT_FONT_RATIO = 14 / 390;
 // The ornamental flourishes flanking the button (user-provided assets) are
@@ -157,7 +156,7 @@ export default function HomeScreen() {
             contentFit="contain"
           />
           <Pressable
-            style={styles.spinButtonWrapper}
+            style={[styles.spinButtonWrapper, styles.spinButtonWrapperFlex]}
             disabled={state !== 'idle' || spinsRemaining <= 0}
             onPress={spin}>
             <LinearGradient
@@ -166,7 +165,6 @@ export default function HomeScreen() {
                 styles.spinButton,
                 {
                   paddingVertical: width * SPIN_BUTTON_PADDING_V_RATIO,
-                  paddingHorizontal: width * SPIN_BUTTON_PADDING_H_RATIO,
                 },
                 (state !== 'idle' || spinsRemaining <= 0) && styles.spinButtonDisabled,
               ]}>
@@ -232,10 +230,15 @@ const styles = StyleSheet.create({
   spinButtonRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    width: '100%',
+    paddingHorizontal: Spacing.three,
   },
   spinButtonWrapper: {
     borderRadius: 28,
     zIndex: 1,
+  },
+  spinButtonWrapperFlex: {
+    flex: 1,
   },
   spinButton: {
     borderRadius: 28,
