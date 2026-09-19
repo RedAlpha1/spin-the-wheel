@@ -22,10 +22,33 @@ const STARTING_COINS = 0;
 const STARTING_SPINS = 3;
 const BACKGROUND_SPIN_DURATION_MS = 20000;
 
+// Chrome around the wheel (titles, chips, SPIN button, result card) was
+// fixed-point — same absolute size on a small phone and a large tablet.
+// Android's device spread is wide (~320dp small phones to 600dp+ tablets/
+// foldables), so these scale off screen width like the wheel itself does.
+// Ratios are each element's old fixed value divided by a 390pt baseline
+// (a common mid-size phone width) so on-device sizing is unchanged there.
+const TITLE_WIDTH_RATIO = 0.62;
+const CHIP_ICON_RATIO = 20 / 390;
+const CHIP_FONT_RATIO = 14 / 390;
+const SPIN_BUTTON_PADDING_V_RATIO = 14 / 390;
+const SPIN_BUTTON_PADDING_H_RATIO = 56 / 390;
+const SPIN_BUTTON_FONT_RATIO = 18 / 390;
+const SPINS_TEXT_FONT_RATIO = 14 / 390;
+// Native pixel aspect ratios of the two title images — sizing height off
+// the image's own aspect instead of a shared box avoids letterboxing.
+const TITLE_TOP_ASPECT = 77 / 497;
+const TITLE_BOTTOM_ASPECT = 133 / 957;
+
 export default function HomeScreen() {
   const { width, height } = useWindowDimensions();
   const wheelSize = Math.min(width * 0.9, height * 0.45);
   const backgroundSize = Math.sqrt(width * width + height * height);
+  const titleWidth = width * TITLE_WIDTH_RATIO;
+  const chipIconSize = width * CHIP_ICON_RATIO;
+  const chipFontSize = width * CHIP_FONT_RATIO;
+  const spinButtonFontSize = width * SPIN_BUTTON_FONT_RATIO;
+  const spinsTextFontSize = width * SPINS_TEXT_FONT_RATIO;
 
   const [coins, setCoins] = useState(STARTING_COINS);
   const [spinsRemaining, setSpinsRemaining] = useState(STARTING_SPINS);
@@ -85,30 +108,32 @@ export default function HomeScreen() {
           <View style={styles.chip}>
             <Image
               source={require('../../assets/images/wheel/icon-coin.svg')}
-              style={styles.chipIcon}
+              style={{ width: chipIconSize, height: chipIconSize }}
               contentFit="contain"
             />
-            <Text style={styles.chipText}>{coins}</Text>
+            <Text style={[styles.chipText, { fontSize: chipFontSize }]}>{coins}</Text>
           </View>
           <View style={styles.chip}>
             <Image
               source={require('../../assets/images/wheel/icon-spin-counter.svg')}
-              style={styles.chipIcon}
+              style={{ width: chipIconSize, height: chipIconSize }}
               contentFit="contain"
             />
-            <Text style={styles.chipText}>{spinsRemaining}/{STARTING_SPINS}</Text>
+            <Text style={[styles.chipText, { fontSize: chipFontSize }]}>
+              {spinsRemaining}/{STARTING_SPINS}
+            </Text>
           </View>
         </View>
 
         <View style={styles.titles}>
           <Image
             source={require('../../assets/images/wheel/title-spin-karo.png')}
-            style={styles.titleTop}
+            style={{ width: titleWidth, height: titleWidth * TITLE_TOP_ASPECT }}
             contentFit="contain"
           />
           <Image
             source={require('../../assets/images/wheel/title-gold-jeeto.png')}
-            style={styles.titleBottom}
+            style={{ width: titleWidth, height: titleWidth * TITLE_BOTTOM_ASPECT }}
             contentFit="contain"
           />
         </View>
@@ -121,12 +146,19 @@ export default function HomeScreen() {
           onPress={spin}>
           <LinearGradient
             colors={['#FFCF87', '#C9971F']}
-            style={[styles.spinButton, (state !== 'idle' || spinsRemaining <= 0) && styles.spinButtonDisabled]}>
-            <Text style={styles.spinButtonText}>SPIN</Text>
+            style={[
+              styles.spinButton,
+              {
+                paddingVertical: width * SPIN_BUTTON_PADDING_V_RATIO,
+                paddingHorizontal: width * SPIN_BUTTON_PADDING_H_RATIO,
+              },
+              (state !== 'idle' || spinsRemaining <= 0) && styles.spinButtonDisabled,
+            ]}>
+            <Text style={[styles.spinButtonText, { fontSize: spinButtonFontSize }]}>SPIN</Text>
           </LinearGradient>
         </Pressable>
 
-        <Text style={styles.spinsText}>
+        <Text style={[styles.spinsText, { fontSize: spinsTextFontSize }]}>
           {spinsRemaining}/{STARTING_SPINS} Spins
         </Text>
       </SafeAreaView>
@@ -168,32 +200,17 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
-  chipIcon: {
-    width: 20,
-    height: 20,
-  },
   chipText: {
     color: '#ffffff',
-    fontSize: 14,
     fontWeight: 'bold',
   },
   titles: {
     alignItems: 'center',
   },
-  titleTop: {
-    width: 220,
-    height: 40,
-  },
-  titleBottom: {
-    width: 220,
-    height: 40,
-  },
   spinButtonWrapper: {
     borderRadius: 28,
   },
   spinButton: {
-    paddingVertical: 14,
-    paddingHorizontal: 56,
     borderRadius: 28,
     alignItems: 'center',
     justifyContent: 'center',
@@ -203,11 +220,9 @@ const styles = StyleSheet.create({
   },
   spinButtonText: {
     color: '#4F031B',
-    fontSize: 18,
     fontWeight: 'bold',
   },
   spinsText: {
     color: '#ffffff',
-    fontSize: 14,
   },
 });
