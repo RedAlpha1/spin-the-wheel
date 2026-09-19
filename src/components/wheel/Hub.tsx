@@ -9,11 +9,12 @@ type Props = {
 
 // On-device check showed 0.32 swallowing the wedge labels — shrunk so the
 // flower+swan stay a small center emblem clear of the label radius.
-const HUB_DECORATION_RATIO = 0.2;
+// Feedback: still too big relative to the wheel — shrunk further to 0.14.
+const HUB_DECORATION_RATIO = 0.14;
 // The maroon/gold backdrop disc the flower+swan sit on (matches the
-// downloaded mockup asset). 0.3 crept into the label radius (see
-// WheelSegments) — 0.26 keeps clearance.
-const HUB_BACKDROP_RATIO = 0.26;
+// downloaded mockup asset). Shrunk alongside the decoration so it stays a
+// tight backing plate instead of a large center medallion.
+const HUB_BACKDROP_RATIO = 0.19;
 
 function HubBase({ size }: Props) {
   const hubDecorationSize = size * HUB_DECORATION_RATIO;
