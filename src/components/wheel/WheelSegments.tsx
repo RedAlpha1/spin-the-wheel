@@ -1,5 +1,14 @@
 import { memo, useMemo } from 'react';
-import Svg, { Defs, G, Image as SvgImage, LinearGradient, Path, Stop, Text as SvgText } from 'react-native-svg';
+import Svg, {
+  Defs,
+  G,
+  Image as SvgImage,
+  LinearGradient,
+  Path,
+  Stop,
+  Text as SvgText,
+  TSpan,
+} from 'react-native-svg';
 
 import type { WheelReward } from '@/constants/wheelRewards';
 import { describeArc, polarToCartesian, segmentBounds } from '@/utils/wheelMath';
@@ -28,7 +37,11 @@ function WheelSegmentsBase({ segments, size }: Props) {
   const iconSize = size * 0.13;
   const iconRadius = r * 0.72;
   const labelRadius = r * 0.4;
-  const fontSize = size * 0.045;
+  // Single-line labels (e.g. "Extra Spin") were wider than the wedge's
+  // chord at labelRadius and spilled into the neighboring segment — each
+  // label wraps onto its own words as stacked lines instead.
+  const fontSize = size * 0.036;
+  const lineHeight = fontSize * 1.15;
 
   const slices = useMemo(
     () =>
@@ -72,18 +85,29 @@ function WheelSegmentsBase({ segments, size }: Props) {
               height={iconSize}
             />
           </G>
-          {segment.kind !== 'noWin' && (
-            <SvgText
-              x={labelPos.x}
-              y={labelPos.y}
-              fontSize={fontSize}
-              fontWeight="bold"
-              fill="#ffffff"
-              textAnchor="middle"
-              transform={`rotate(${mid} ${labelPos.x} ${labelPos.y})`}>
-              {segment.label}
-            </SvgText>
-          )}
+          {segment.kind !== 'noWin' && (() => {
+            const words = segment.label.split(' ');
+            const startDy = -(lineHeight * (words.length - 1)) / 2;
+            return (
+              <SvgText
+                x={labelPos.x}
+                y={labelPos.y}
+                fontSize={fontSize}
+                fontWeight="bold"
+                fill="#ffffff"
+                textAnchor="middle"
+                transform={`rotate(${mid} ${labelPos.x} ${labelPos.y})`}>
+                {words.map((word, wordIndex) => (
+                  <TSpan
+                    key={word}
+                    x={labelPos.x}
+                    dy={wordIndex === 0 ? startDy : lineHeight}>
+                    {word}
+                  </TSpan>
+                ))}
+              </SvgText>
+            );
+          })()}
         </G>
       ))}
     </Svg>
