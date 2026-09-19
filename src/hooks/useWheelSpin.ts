@@ -1,3 +1,9 @@
+import { useCallback, useRef, useState } from 'react';
+import { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
+
+import { segmentBounds } from '@/utils/wheelMath';
+
 /**
  * Picks an index into `weights` with probability proportional to each
  * weight. Weights don't need to sum to any particular total.
@@ -30,4 +36,73 @@ function mod360(deg: number): number {
 export function computeTargetRotation(current: number, mid: number, fullTurns: number = FULL_TURNS): number {
   const delta = mod360(-mid - current);
   return current + 360 * fullTurns + delta;
+}
+
+const SPIN_DURATION_MS = 2500;
+
+export type SpinState = 'idle' | 'spinning' | 'result';
+
+type WeightedItem = { weight: number };
+
+type UseWheelSpinOptions<T extends WeightedItem> = {
+  rewards: T[];
+  canSpin: boolean;
+  onSpinStart: () => void;
+  onResult: (reward: T) => void;
+};
+
+/**
+ * Owns the wedge-layer rotation and the idle/spinning/result state machine
+ * for one spin. See docs/superpowers/specs/2026-09-19-spin-wheel-phase2-design.md
+ * for the full data-flow writeup this implements.
+ */
+export function useWheelSpin<T extends WeightedItem>({
+  rewards,
+  canSpin,
+  onSpinStart,
+  onResult,
+}: UseWheelSpinOptions<T>) {
+  const rotation = useSharedValue(0);
+  const isSpinningRef = useRef(false);
+  const [state, setState] = useState<SpinState>('idle');
+  const [currentReward, setCurrentReward] = useState<T | null>(null);
+
+  const handleSpinComplete = useCallback(
+    (rewardIndex: number) => {
+      isSpinningRef.current = false;
+      const reward = rewards[rewardIndex];
+      setCurrentReward(reward);
+      setState('result');
+      onResult(reward);
+    },
+    [rewards, onResult],
+  );
+
+  const spin = useCallback(() => {
+    if (isSpinningRef.current || state !== 'idle' || !canSpin) {
+      return;
+    }
+    isSpinningRef.current = true;
+    onSpinStart();
+
+    const weights = rewards.map((reward) => reward.weight);
+    const rewardIndex = pickWeightedIndex(weights);
+    const mid = segmentBounds(rewardIndex, rewards.length).mid;
+    const target = computeTargetRotation(rotation.value, mid);
+
+    setState('spinning');
+    rotation.value = withTiming(target, { duration: SPIN_DURATION_MS, easing: Easing.out(Easing.cubic) }, (finished) => {
+      'worklet';
+      if (finished) {
+        scheduleOnRN(handleSpinComplete, rewardIndex);
+      }
+    });
+  }, [state, canSpin, rewards, onSpinStart, rotation, handleSpinComplete]);
+
+  const dismissResult = useCallback(() => {
+    setState('idle');
+    setCurrentReward(null);
+  }, []);
+
+  return { rotation, state, currentReward, spin, dismissResult };
 }
