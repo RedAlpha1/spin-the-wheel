@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Wheel } from '@/components/wheel/Wheel';
 import { SpinResultCard } from '@/components/wheel/SpinResultCard';
 import { WHEEL_REWARDS, type WheelReward } from '@/constants/wheelRewards';
-import { BottomTabInset, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useWheelSpin } from '@/hooks/useWheelSpin';
 
 const STARTING_COINS = 0;
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'space-evenly',
-    paddingBottom: BottomTabInset + Spacing.three,
+    paddingBottom: Spacing.three,
   },
   header: {
     flexDirection: 'row',
