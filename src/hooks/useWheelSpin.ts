@@ -1,5 +1,7 @@
+import { useAudioPlayer } from 'expo-audio';
+import * as Haptics from 'expo-haptics';
 import { useCallback, useRef, useState } from 'react';
-import { Easing, useSharedValue, withTiming } from 'react-native-reanimated';
+import { Easing, useAnimatedReaction, useSharedValue, withTiming } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 
 import { segmentBounds } from '@/utils/wheelMath';
@@ -26,6 +28,7 @@ export function pickWeightedIndex(weights: number[], random: () => number = Math
 const FULL_TURNS = 7;
 
 function mod360(deg: number): number {
+  'worklet';
   return ((deg % 360) + 360) % 360;
 }
 
@@ -70,15 +73,41 @@ export function useWheelSpin<T extends WeightedItem>({
   const [state, setState] = useState<SpinState>('idle');
   const [currentReward, setCurrentReward] = useState<T | null>(null);
 
+  // Most prize-wheel apps pair the spin with a tick per segment crossed
+  // (the classic mechanical-peg feel) plus a win notification on landing —
+  // both haptic and audible, since either channel alone is easy to miss.
+  const tickPlayer = useAudioPlayer(require('../../assets/sounds/spin-tick.wav'));
+  const winPlayer = useAudioPlayer(require('../../assets/sounds/spin-win.wav'));
+
+  const playTick = useCallback(() => {
+    Haptics.selectionAsync();
+    tickPlayer.seekTo(0);
+    tickPlayer.play();
+  }, [tickPlayer]);
+
+  const segmentAngle = 360 / rewards.length;
+  useAnimatedReaction(
+    () => Math.floor(mod360(rotation.value) / segmentAngle),
+    (current, previous) => {
+      if (previous !== null && current !== previous) {
+        scheduleOnRN(playTick);
+      }
+    },
+    [segmentAngle],
+  );
+
   const handleSpinComplete = useCallback(
     (rewardIndex: number) => {
       isSpinningRef.current = false;
       const reward = rewards[rewardIndex];
       setCurrentReward(reward);
       setState('result');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      winPlayer.seekTo(0);
+      winPlayer.play();
       onResult(reward);
     },
-    [rewards, onResult],
+    [rewards, onResult, winPlayer],
   );
 
   const spin = useCallback(() => {
@@ -86,6 +115,7 @@ export function useWheelSpin<T extends WeightedItem>({
       return;
     }
     isSpinningRef.current = true;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onSpinStart();
 
     const weights = rewards.map((reward) => reward.weight);
