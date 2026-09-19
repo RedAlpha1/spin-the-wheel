@@ -33,6 +33,16 @@ function gradientId(colors: [string, string]): string {
   return `wedge-gradient-${colors[0].replace('#', '')}-${colors[1].replace('#', '')}`;
 }
 
+// Rotating a wedge's content by its raw mid angle reads/renders upside
+// down for any wedge in the bottom half (mid in (90, 270)) — flip an extra
+// 180deg there so both the icon and label stay upright, matching the
+// mockup. Applied to icons too: an asymmetric icon (e.g. the Grand Prize
+// bag) rotated a full 240deg reads as visibly tipped over, unlike a
+// roughly symmetric one (gold bars) that hides it.
+function uprightRotation(mid: number): number {
+  return mid > 90 && mid < 270 ? mid + 180 : mid;
+}
+
 function WheelSegmentsBase({ segments, size }: Props) {
   const cx = size / 2;
   const cy = size / 2;
@@ -92,7 +102,7 @@ function WheelSegmentsBase({ segments, size }: Props) {
       {slices.map(({ segment, path, iconPos, labelPos, mid }) => (
         <G key={segment.id}>
           <Path d={path} fill={`url(#${gradientId(segment.colors)})`} />
-          <G transform={`rotate(${mid} ${iconPos.x} ${iconPos.y})`}>
+          <G transform={`rotate(${uprightRotation(mid)} ${iconPos.x} ${iconPos.y})`}>
             <SvgImage
               href={segment.icon}
               x={iconPos.x - iconSize / 2}
@@ -104,11 +114,7 @@ function WheelSegmentsBase({ segments, size }: Props) {
           {segment.kind !== 'noWin' && (() => {
             const words = segment.label.split(' ');
             const startDy = -(lineHeight * (words.length - 1)) / 2;
-            // Rotating text by the wedge's raw mid angle reads upside down
-            // for any wedge in the bottom half (mid in (90, 270)) — flip an
-            // extra 180deg there so every label stays readable, matching
-            // the mockup.
-            const labelRotation = mid > 90 && mid < 270 ? mid + 180 : mid;
+            const labelRotation = uprightRotation(mid);
             return (
               <SvgText
                 x={labelPos.x}
